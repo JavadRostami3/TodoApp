@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 10px;
+        }
+
+        .day {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .day:hover {
+            background-color: #e2e6ea;
+        }
+
+        .todo-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px;
+            font-size: 12px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .weekday {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Calendar</h1>
+
+        <div class="calendar">
+            <div class="weekday">Saturday</div>
+            <div class="weekday">Sunday</div>
+            <div class="weekday">Monday</div>
+            <div class="weekday">Tuesday</div>
+            <div class="weekday">Wednesday</div>
+            <div class="weekday">Thursday</div>
+            <div class="weekday">Friday</div>
+        </div>
+
+        <div class="calendar mt-2"></div>
+    </div>
+
+    <script>
+        var todoList = JSON.parse(localStorage.getItem('todoList')) || [];
+
+        function updateCalendar() {
+            const calendar = document.querySelectorAll('.calendar')[1]; 
+            calendar.innerHTML = '';
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyDay = document.createElement('div');
+                calendar.appendChild(emptyDay);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                dayElement.textContent = day;
+
+                const currentDate = new Date(year, month, day).toISOString().split('T')[0];
+
+                const todoCount = todoList.filter(function(todo) {
+                    const todoDate = new Date(todo.Date).toISOString().split('T')[0];
+                    return todoDate === currentDate;
+                }).length;
+
+                if (todoCount > 0) {
+                    const todoCountElement = document.createElement('div');
+                    todoCountElement.classList.add('todo-count', 'rounded-circle', 'd-flex', 'align-items-center', 'justify-content-center');
+                    todoCountElement.textContent = todoCount;
+                    dayElement.appendChild(todoCountElement);
+                }
+
+                dayElement.onclick = function() {
+                    window.location.href = `index.html?date=${currentDate}`;
+                };
+
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        updateCalendar();
+    </script>
+
+</body>
+</html>
